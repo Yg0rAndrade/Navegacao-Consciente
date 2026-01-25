@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Navegação Consciente",
+  "version": "1.0",
+  "description": "Te ajuda a refletir antes de navegar por impulso",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["style.css"],
+      "run_at": "document_start"
+    }
+  ],
+  "icons": {
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

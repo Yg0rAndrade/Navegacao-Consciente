@@ -1,0 +1,452 @@
+/* ===========================================
+   Navegação Consciente - Blocker Modal
+   Liquid Glass Design System
+   =========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
+
+/* === ROOT VARIABLES === */
+:root {
+  --c-glass: #9ca3af;
+  --c-light: #fff;
+  --c-dark: #1a1a2e;
+
+  --c-bg: #f0f1f3;
+  --c-content: #1a1a2e;
+  --c-content-soft: #64748b;
+  --c-action: #6366f1;
+
+  --c-success: #10b981;
+  --c-danger: #f43f5e;
+  --c-warning: #f59e0b;
+
+  --glass-reflex-dark: 1;
+  --glass-reflex-light: 1;
+  --saturation: 120%;
+
+  --font-main: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition-smooth: 400ms cubic-bezier(1, 0.0, 0.4, 1);
+  --transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* === OVERLAY === */
+#impulso-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--c-bg);
+  z-index: 2147483647;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: var(--font-main);
+  font-optical-sizing: auto;
+  transition: background var(--transition-smooth);
+}
+
+/* Dark theme */
+#impulso-overlay.dark {
+  --c-glass: #6b7280;
+  --c-light: #fff;
+  --c-dark: #000;
+
+  --c-bg: #0f0f12;
+  --c-content: #f1f5f9;
+  --c-content-soft: #94a3b8;
+  --c-action: #818cf8;
+
+  --glass-reflex-dark: 2.5;
+  --glass-reflex-light: 0.25;
+  --saturation: 150%;
+}
+
+/* Dim theme */
+#impulso-overlay.dim {
+  --c-glass: hsl(260 30% 60% / 1);
+  --c-light: #c7d2fe;
+  --c-dark: #1e1b4b;
+
+  --c-bg: #1e1b4b;
+  --c-content: #e0e7ff;
+  --c-content-soft: #a5b4fc;
+  --c-action: #f472b6;
+
+  --glass-reflex-dark: 2;
+  --glass-reflex-light: 0.6;
+  --saturation: 180%;
+}
+
+/* === MODAL === */
+#impulso-modal {
+  background-color: color-mix(in srgb, var(--c-glass) 18%, transparent);
+  backdrop-filter: blur(16px) saturate(var(--saturation));
+  -webkit-backdrop-filter: blur(16px) saturate(var(--saturation));
+  border-radius: 28px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 14%), transparent),
+    inset 1.5px 2.5px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 85%), transparent),
+    inset -2px -2px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 65%), transparent),
+    inset -3px -8px 2px -6px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 45%), transparent),
+    inset -0.5px -1px 4px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent),
+    inset -1.5px 2.5px 3px -1px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 14%), transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 16%), transparent),
+    0px 2px 10px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent),
+    0px 12px 40px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent);
+  animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition:
+    background-color var(--transition-smooth),
+    box-shadow var(--transition-smooth);
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.96); }
+}
+
+/* === HEADER === */
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.modal-icon {
+  width: 52px;
+  height: 52px;
+  background-color: color-mix(in srgb, var(--c-glass) 15%, transparent);
+  backdrop-filter: blur(12px) saturate(var(--saturation));
+  -webkit-backdrop-filter: blur(12px) saturate(var(--saturation));
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 12%), transparent),
+    inset 1.5px 2px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 80%), transparent),
+    inset -1.5px -1.5px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 60%), transparent),
+    inset -2px -6px 2px -5px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 40%), transparent),
+    inset -0.5px -1px 3px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent),
+    inset -1px 2px 3px -1px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 12%), transparent),
+    inset 0px 2px 3px -1px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 15%), transparent),
+    0px 2px 8px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 6%), transparent),
+    0px 8px 24px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 5%), transparent);
+  transition:
+    background-color var(--transition-smooth),
+    box-shadow var(--transition-smooth);
+}
+
+.modal-icon svg {
+  width: 26px;
+  height: 26px;
+  stroke: var(--c-action);
+  stroke-width: 2.5;
+  fill: none;
+  transition: stroke var(--transition-smooth);
+}
+
+.modal-title {
+  flex: 1;
+}
+
+.modal-title h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--c-content);
+  letter-spacing: -0.3px;
+}
+
+.modal-title p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--c-content-soft);
+  font-weight: 500;
+}
+
+/* === SITE DISPLAY === */
+.modal-site {
+  background-color: color-mix(in srgb, var(--c-glass) 12%, transparent);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 8%), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 30%), transparent),
+    inset 0 2px 4px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 6%), transparent);
+}
+
+.modal-site-indicator {
+  width: 10px;
+  height: 10px;
+  background: var(--c-danger);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--c-danger);
+  animation: pulse 2s ease-in-out infinite;
+  transition: all var(--transition-smooth);
+}
+
+.modal-site-indicator.ready {
+  background: var(--c-success);
+  box-shadow: 0 0 10px var(--c-success);
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.modal-site-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--c-content);
+  word-break: break-all;
+}
+
+/* === QUESTION === */
+.modal-question {
+  font-size: 15px;
+  color: var(--c-content-soft);
+  line-height: 1.6;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.modal-question strong {
+  color: var(--c-content);
+  font-weight: 600;
+}
+
+/* === COOLDOWN BAR === */
+.cooldown-container {
+  margin-bottom: 24px;
+}
+
+.cooldown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.cooldown-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--c-content-soft);
+  font-weight: 600;
+}
+
+.cooldown-time {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--c-warning);
+  transition: color var(--transition-smooth);
+}
+
+.cooldown-time.ready {
+  color: var(--c-success);
+}
+
+.cooldown-bar {
+  height: 8px;
+  background-color: color-mix(in srgb, var(--c-glass) 15%, transparent);
+  border-radius: 99px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 6%), transparent),
+    inset 0 2px 3px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
+}
+
+.cooldown-progress {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--c-warning) 0%, color-mix(in srgb, var(--c-warning) 90%, var(--c-danger)) 100%);
+  border-radius: 99px;
+  transition: width 1s linear;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) 30%, transparent),
+    0 0 12px color-mix(in srgb, var(--c-warning) 50%, transparent);
+}
+
+.cooldown-progress.complete {
+  background: linear-gradient(90deg, var(--c-success) 0%, color-mix(in srgb, var(--c-success) 85%, #06b6d4) 100%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) 30%, transparent),
+    0 0 12px color-mix(in srgb, var(--c-success) 50%, transparent);
+}
+
+/* === BUTTONS === */
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.modal-btn {
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--transition-bounce);
+  position: relative;
+  letter-spacing: -0.2px;
+}
+
+.modal-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+/* Exit Button */
+.modal-btn-exit {
+  background-color: color-mix(in srgb, var(--c-glass) 15%, transparent);
+  backdrop-filter: blur(12px) saturate(var(--saturation));
+  -webkit-backdrop-filter: blur(12px) saturate(var(--saturation));
+  color: var(--c-content-soft);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 8%), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 40%), transparent),
+    inset 0 -1px 2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 6%), transparent);
+}
+
+.modal-btn-exit:hover {
+  background-color: color-mix(in srgb, var(--c-glass) 22%, transparent);
+  color: var(--c-content);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 12%), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 55%), transparent),
+    inset 0 -1px 2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent),
+    0 4px 12px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent),
+    0 1px 3px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
+}
+
+.modal-btn-exit:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Enter Button */
+.modal-btn-enter {
+  background: linear-gradient(135deg, var(--c-success) 0%, color-mix(in srgb, var(--c-success) 85%, #06b6d4) 100%);
+  color: white;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) 25%, transparent),
+    inset 0 -1px 2px color-mix(in srgb, var(--c-dark) 15%, transparent),
+    0 4px 12px color-mix(in srgb, var(--c-success) 35%, transparent),
+    0 1px 3px color-mix(in srgb, var(--c-dark) 10%, transparent);
+}
+
+.modal-btn-enter:hover:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) 30%, transparent),
+    inset 0 -1px 2px color-mix(in srgb, var(--c-dark) 15%, transparent),
+    0 8px 20px color-mix(in srgb, var(--c-success) 40%, transparent),
+    0 2px 4px color-mix(in srgb, var(--c-dark) 12%, transparent);
+}
+
+.modal-btn-enter:active:not(.disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.modal-btn-enter.disabled {
+  background-color: color-mix(in srgb, var(--c-glass) 15%, transparent);
+  backdrop-filter: blur(12px) saturate(var(--saturation));
+  -webkit-backdrop-filter: blur(12px) saturate(var(--saturation));
+  color: var(--c-content);
+  opacity: 0.7;
+  cursor: not-allowed;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 8%), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 40%), transparent),
+    inset 0 -1px 2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 6%), transparent);
+}
+
+.modal-btn-enter.disabled svg {
+  stroke: var(--c-content);
+  opacity: 0.7;
+}
+
+/* === KEYBOARD HINT === */
+.modal-hint {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--c-content-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.modal-hint kbd {
+  background-color: color-mix(in srgb, var(--c-glass) 18%, transparent);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-main);
+  color: var(--c-content);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 10%), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 40%), transparent),
+    0 2px 4px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
+}
+
+/* === BODY LOCK === */
+html.impulso-bloqueado body {
+  overflow: hidden !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+html.impulso-bloqueado body * {
+  pointer-events: none !important;
+}
+
+html.impulso-bloqueado #impulso-overlay,
+html.impulso-bloqueado #impulso-overlay * {
+  pointer-events: auto !important;
+}
+
+/* Pausa e oculta mídia quando bloqueado */
+html.impulso-bloqueado video,
+html.impulso-bloqueado audio {
+  pointer-events: none !important;
+}
+
+html.impulso-bloqueado iframe {
+  pointer-events: none !important;
+  opacity: 0.3;
+}
