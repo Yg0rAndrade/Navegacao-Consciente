@@ -61,12 +61,7 @@ async function loadConfig() {
 
 // Verifica se o site atual está na lista
 function siteNaLista() {
-  // #region agent log
-  const resultado = sites.some(site => currentHostname.includes(site) || site.includes(currentHostname));
-  const detalhes = sites.map(site => ({site, hostnameIncludesSite: currentHostname.includes(site), siteIncludesHostname: site.includes(currentHostname)}));
-  fetch('http://127.0.0.1:7360/ingest/3a0d72e1-1952-4e25-8f42-c9eea6631d56',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'692e06'},body:JSON.stringify({sessionId:'692e06',location:'content.js:siteNaLista',message:'siteNaLista check',data:{currentHostname,protocol:window.location.protocol,href:window.location.href,sites,resultado,detalhes},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
-  return resultado;
-  // #endregion
+  return sites.some(site => currentHostname.includes(site) || site.includes(currentHostname));
 }
 
 // Verifica se já respondeu para este site na sessão
@@ -558,28 +553,12 @@ chrome.storage.onChanged.addListener((changes, area) => {
 async function init() {
   await loadConfig();
 
-  // #region agent log
-  fetch('http://127.0.0.1:7360/ingest/3a0d72e1-1952-4e25-8f42-c9eea6631d56',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'692e06'},body:JSON.stringify({sessionId:'692e06',location:'content.js:init',message:'init after loadConfig',data:{currentHostname,protocol:window.location.protocol,href:window.location.href,sites,timerDuration,sitesLength:sites.length},timestamp:Date.now(),hypothesisId:'B'})}).catch(()=>{});
-  // #endregion
-
-  if (sites.length === 0 || !siteNaLista()) {
-    // #region agent log
-    fetch('http://127.0.0.1:7360/ingest/3a0d72e1-1952-4e25-8f42-c9eea6631d56',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'692e06'},body:JSON.stringify({sessionId:'692e06',location:'content.js:init-exit-early',message:'exiting: no sites or not in list',data:{sitesLength:sites.length,siteNaLista:siteNaLista()},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-    return;
-  }
+  if (sites.length === 0 || !siteNaLista()) return;
 
   if (jaRespondeu()) {
-    // #region agent log
-    fetch('http://127.0.0.1:7360/ingest/3a0d72e1-1952-4e25-8f42-c9eea6631d56',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'692e06'},body:JSON.stringify({sessionId:'692e06',location:'content.js:init-ja-respondeu',message:'already answered',data:{currentHostname,jaRespondeu:true},timestamp:Date.now(),hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     if (showClock) mostrarCronometro();
     return;
   }
-
-  // #region agent log
-  fetch('http://127.0.0.1:7360/ingest/3a0d72e1-1952-4e25-8f42-c9eea6631d56',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'692e06'},body:JSON.stringify({sessionId:'692e06',location:'content.js:init-showing-modal',message:'about to show modal',data:{currentHostname,protocol:window.location.protocol,href:window.location.href},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', mostrarModal);
