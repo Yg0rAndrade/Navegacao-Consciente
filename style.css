@@ -424,6 +424,361 @@
     0 2px 4px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
 }
 
+/* === FLOATING CHRONOMETER === */
+#impulso-cronometro {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2147483646;
+  font-family: var(--font-main);
+  font-optical-sizing: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--c-bg) 85%, var(--c-glass));
+  backdrop-filter: blur(16px) saturate(var(--saturation));
+  -webkit-backdrop-filter: blur(16px) saturate(var(--saturation));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 14%), transparent),
+    inset 1.5px 2px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 80%), transparent),
+    inset -1.5px -1.5px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 60%), transparent),
+    inset -0.5px -1px 3px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent),
+    0px 2px 10px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent),
+    0px 8px 24px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 6%), transparent);
+  animation: cronometroIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition:
+    background-color var(--transition-smooth),
+    box-shadow var(--transition-smooth),
+    opacity var(--transition-smooth);
+  cursor: default;
+  user-select: none;
+  gap: 6px;
+}
+
+#impulso-cronometro.dark {
+  --c-bg: #0f0f12;
+  --c-glass: #6b7280;
+  --c-light: #fff;
+  --c-dark: #000;
+  --c-content: #f1f5f9;
+  --c-content-soft: #94a3b8;
+  --c-action: #818cf8;
+  --c-warning: #f59e0b;
+  --glass-reflex-dark: 2.5;
+  --glass-reflex-light: 0.25;
+  --saturation: 150%;
+}
+
+#impulso-cronometro.dim {
+  --c-bg: #1e1b4b;
+  --c-glass: hsl(260 30% 60% / 1);
+  --c-light: #c7d2fe;
+  --c-dark: #1e1b4b;
+  --c-content: #e0e7ff;
+  --c-content-soft: #a5b4fc;
+  --c-action: #f472b6;
+  --c-warning: #f59e0b;
+  --glass-reflex-dark: 2;
+  --glass-reflex-light: 0.6;
+  --saturation: 180%;
+}
+
+#impulso-cronometro:hover {
+  background-color: color-mix(in srgb, var(--c-bg) 78%, var(--c-glass));
+}
+
+.cronometro-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--c-action);
+  stroke-width: 2.5;
+  fill: none;
+  display: block;
+}
+
+.cronometro-time {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c-content);
+  letter-spacing: 0.3px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.cronometro-site {
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--c-content-soft);
+  font-weight: 600;
+  line-height: 1;
+  max-width: 56px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cronometro-separator {
+  animation: cronometroBlink 1s step-end infinite;
+}
+
+@keyframes cronometroIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cronometroBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes cronometroShake {
+  0% { transform: rotate(0deg) scale(1); }
+  10% { transform: rotate(-12deg) scale(1.1); }
+  20% { transform: rotate(10deg) scale(1.12); }
+  30% { transform: rotate(-8deg) scale(1.1); }
+  40% { transform: rotate(6deg) scale(1.08); }
+  50% { transform: rotate(-4deg) scale(1.05); }
+  60% { transform: rotate(2deg) scale(1.02); }
+  70% { transform: rotate(0deg) scale(1); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+#impulso-cronometro.minute-pulse {
+  animation: cronometroShake 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 14%), transparent),
+    0px 0px 20px 4px color-mix(in srgb, var(--c-danger) 50%, transparent),
+    0px 0px 40px 8px color-mix(in srgb, var(--c-danger) 25%, transparent);
+}
+
+#impulso-cronometro.minute-pulse .cronometro-icon svg {
+  stroke: var(--c-danger);
+}
+
+#impulso-cronometro.minute-pulse .cronometro-time {
+  color: var(--c-danger);
+}
+
+/* === CHRONOMETER ALERT STATE === */
+#impulso-cronometro.alerta .cronometro-time {
+  color: var(--c-danger) !important;
+  animation: cronometroAlertPulse 1s ease-in-out infinite;
+}
+
+#impulso-cronometro.alerta {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 14%), transparent),
+    inset 1.5px 2px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 80%), transparent),
+    inset -1.5px -1.5px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 60%), transparent),
+    inset -0.5px -1px 3px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent),
+    0px 2px 10px 0px color-mix(in srgb, var(--c-danger) 30%, transparent),
+    0px 8px 24px 0px color-mix(in srgb, var(--c-danger) 20%, transparent);
+}
+
+#impulso-cronometro.alerta .cronometro-icon svg {
+  stroke: var(--c-danger);
+}
+
+@keyframes cronometroAlertPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* === TIME ALERT MODAL === */
+#impulso-alerta-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 2147483647;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: var(--font-main);
+  font-optical-sizing: auto;
+  animation: alertOverlayIn 0.3s ease-out;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+@keyframes alertOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes alertOverlayOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+#impulso-alerta-modal {
+  text-align: center;
+  max-width: 440px;
+  width: 90%;
+  padding: 40px 32px;
+  background-color: color-mix(in srgb, var(--c-glass) 18%, transparent);
+  backdrop-filter: blur(16px) saturate(var(--saturation));
+  -webkit-backdrop-filter: blur(16px) saturate(var(--saturation));
+  border-radius: 28px;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 14%), transparent),
+    inset 1.5px 2.5px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 85%), transparent),
+    inset -2px -2px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 65%), transparent),
+    0px 12px 40px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 15%), transparent);
+  animation: alertModalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes alertModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.alerta-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, var(--c-danger) 0%, #dc2626 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 30px color-mix(in srgb, var(--c-danger) 50%, transparent),
+    0 0 60px color-mix(in srgb, var(--c-danger) 25%, transparent);
+  animation: alertIconPulse 2s ease-in-out infinite;
+}
+
+@keyframes alertIconPulse {
+  0%, 100% { box-shadow: 0 0 30px color-mix(in srgb, var(--c-danger) 50%, transparent), 0 0 60px color-mix(in srgb, var(--c-danger) 25%, transparent); }
+  50% { box-shadow: 0 0 40px color-mix(in srgb, var(--c-danger) 60%, transparent), 0 0 80px color-mix(in srgb, var(--c-danger) 35%, transparent); }
+}
+
+.alerta-icon svg {
+  width: 36px;
+  height: 36px;
+  stroke: white;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.alerta-tempo-perdido {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--c-danger);
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+  line-height: 1.1;
+  text-shadow: 0 0 30px color-mix(in srgb, var(--c-danger) 40%, transparent);
+}
+
+.alerta-titulo {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--c-danger);
+  margin-bottom: 8px;
+  letter-spacing: -0.2px;
+  opacity: 0.85;
+}
+
+.alerta-descricao {
+  font-size: 14px;
+  color: var(--c-content-soft);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.alerta-descricao strong {
+  color: var(--c-danger);
+  font-weight: 600;
+}
+
+.alerta-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.alerta-btn {
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.alerta-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.alerta-btn-sair {
+  background: linear-gradient(135deg, var(--c-danger) 0%, #dc2626 100%);
+  color: white;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) 25%, transparent),
+    0 4px 16px color-mix(in srgb, var(--c-danger) 40%, transparent);
+}
+
+.alerta-btn-sair:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) 30%, transparent),
+    0 8px 24px color-mix(in srgb, var(--c-danger) 50%, transparent);
+}
+
+.alerta-btn-sair:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.alerta-btn-continuar {
+  background-color: color-mix(in srgb, var(--c-glass) 15%, transparent);
+  backdrop-filter: blur(12px) saturate(var(--saturation));
+  -webkit-backdrop-filter: blur(12px) saturate(var(--saturation));
+  color: var(--c-content-soft);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 8%), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 40%), transparent);
+}
+
+.alerta-btn-continuar:hover {
+  background-color: color-mix(in srgb, var(--c-glass) 22%, transparent);
+  color: var(--c-content);
+  transform: translateY(-2px);
+}
+
+.alerta-btn-continuar:active {
+  transform: translateY(0) scale(0.98);
+}
+
 /* === BODY LOCK === */
 html.impulso-bloqueado body {
   overflow: hidden !important;
@@ -436,7 +791,9 @@ html.impulso-bloqueado body * {
 }
 
 html.impulso-bloqueado #impulso-overlay,
-html.impulso-bloqueado #impulso-overlay * {
+html.impulso-bloqueado #impulso-overlay *,
+html.impulso-bloqueado #impulso-alerta-overlay,
+html.impulso-bloqueado #impulso-alerta-overlay * {
   pointer-events: auto !important;
 }
 

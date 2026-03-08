@@ -76,7 +76,6 @@
 
     body {
       width: 360px;
-      min-height: 520px;
       font-family: var(--font-main);
       font-size: 14px;
       line-height: 1.5;
@@ -130,10 +129,10 @@
     }
 
     .header-icon {
-      width: 42px;
-      height: 42px;
+      width: 34px;
+      height: 34px;
       background: linear-gradient(135deg, var(--c-action) 0%, color-mix(in srgb, var(--c-action) 80%, var(--c-danger)) 100%);
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -143,18 +142,19 @@
     }
 
     .header-icon svg {
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       stroke: white;
       stroke-width: 2.5;
       fill: none;
     }
 
     .header-text h1 {
-      font-size: 16px;
+      font-size: 13px;
       font-weight: 600;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.2px;
       color: var(--c-content);
+      white-space: nowrap;
     }
 
     .header-text p {
@@ -217,88 +217,6 @@
         0 2px 4px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
     }
 
-    /* === SITE CARD === */
-    .site-card {
-      padding: 16px;
-    }
-
-    .site-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .site-card-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--c-content-soft);
-      font-weight: 600;
-    }
-
-    .site-card-status {
-      font-size: 10px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 99px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: all var(--transition-smooth);
-    }
-
-    .site-card-status::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-    }
-
-    .site-card-status.blocked {
-      background-color: color-mix(in srgb, var(--c-danger) 15%, transparent);
-      color: var(--c-danger);
-    }
-
-    .site-card-status.blocked::before {
-      background: var(--c-danger);
-      box-shadow: 0 0 6px var(--c-danger);
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    .site-card-status.allowed {
-      background-color: color-mix(in srgb, var(--c-success) 15%, transparent);
-      color: var(--c-success);
-    }
-
-    .site-card-status.allowed::before {
-      background: var(--c-success);
-      box-shadow: 0 0 6px var(--c-success);
-    }
-
-    .site-card-status.system {
-      background-color: color-mix(in srgb, var(--c-glass) 20%, transparent);
-      color: var(--c-content-soft);
-    }
-
-    .site-card-status.system::before {
-      background: var(--c-content-soft);
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    .site-card-name {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--c-content);
-      word-break: break-all;
-      margin-bottom: 14px;
-      letter-spacing: -0.3px;
-    }
-
     /* === BUTTONS === */
     .btn {
       width: 100%;
@@ -323,52 +241,6 @@
       stroke: currentColor;
       stroke-width: 2.5;
       fill: none;
-    }
-
-    .btn-danger {
-      background: linear-gradient(135deg, var(--c-danger) 0%, color-mix(in srgb, var(--c-danger) 85%, var(--c-action)) 100%);
-      color: white;
-      box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--c-light) 25%, transparent),
-        inset 0 -1px 2px color-mix(in srgb, var(--c-dark) 15%, transparent),
-        0 4px 12px color-mix(in srgb, var(--c-danger) 35%, transparent),
-        0 1px 3px color-mix(in srgb, var(--c-dark) 10%, transparent);
-    }
-
-    .btn-danger:hover {
-      transform: translateY(-2px);
-      box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--c-light) 30%, transparent),
-        inset 0 -1px 2px color-mix(in srgb, var(--c-dark) 15%, transparent),
-        0 8px 20px color-mix(in srgb, var(--c-danger) 40%, transparent),
-        0 2px 4px color-mix(in srgb, var(--c-dark) 12%, transparent);
-    }
-
-    .btn-danger:active {
-      transform: translateY(0) scale(0.98);
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, var(--c-success) 0%, color-mix(in srgb, var(--c-success) 85%, #06b6d4) 100%);
-      color: white;
-      box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--c-light) 25%, transparent),
-        inset 0 -1px 2px color-mix(in srgb, var(--c-dark) 15%, transparent),
-        0 4px 12px color-mix(in srgb, var(--c-success) 35%, transparent),
-        0 1px 3px color-mix(in srgb, var(--c-dark) 10%, transparent);
-    }
-
-    .btn-success:hover {
-      transform: translateY(-2px);
-      box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--c-light) 30%, transparent),
-        inset 0 -1px 2px color-mix(in srgb, var(--c-dark) 15%, transparent),
-        0 8px 20px color-mix(in srgb, var(--c-success) 40%, transparent),
-        0 2px 4px color-mix(in srgb, var(--c-dark) 12%, transparent);
-    }
-
-    .btn-success:active {
-      transform: translateY(0) scale(0.98);
     }
 
     /* === CONFIG SECTION === */
@@ -431,6 +303,38 @@
       box-shadow:
         inset 0 1px 0 color-mix(in srgb, var(--c-light) 30%, transparent),
         0 4px 12px color-mix(in srgb, var(--c-warning) 40%, transparent);
+    }
+
+    /* === ALERT TIMER BUTTONS === */
+    .alert-btn {
+      flex: 1;
+      padding: 10px 0;
+      background-color: color-mix(in srgb, var(--c-glass) 12%, transparent);
+      border: none;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--c-content-soft);
+      cursor: pointer;
+      font-family: var(--font-main);
+      transition: all 200ms ease;
+      box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 6%), transparent),
+        inset 0 1px 0 color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 30%), transparent);
+    }
+
+    .alert-btn:hover {
+      color: var(--c-content);
+      background-color: color-mix(in srgb, var(--c-glass) 20%, transparent);
+      transform: translateY(-1px);
+    }
+
+    .alert-btn.active {
+      color: white;
+      background: linear-gradient(135deg, var(--c-danger) 0%, color-mix(in srgb, var(--c-danger) 80%, #dc2626) 100%);
+      box-shadow:
+        inset 0 1px 0 color-mix(in srgb, var(--c-light) 30%, transparent),
+        0 4px 12px color-mix(in srgb, var(--c-danger) 40%, transparent);
     }
 
     /* === INPUT GROUP === */
@@ -634,6 +538,79 @@
       background: var(--c-action);
     }
 
+    /* === TOGGLE === */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+    }
+
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--c-content-soft);
+      font-weight: 600;
+    }
+
+    .toggle-label svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background-color: color-mix(in srgb, var(--c-glass) 25%, transparent);
+      border-radius: 99px;
+      transition: background-color 200ms ease;
+      box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 6%), transparent),
+        inset 0 2px 4px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      top: 3px;
+      background: var(--c-content-soft);
+      border-radius: 50%;
+      transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 1px 3px color-mix(in srgb, var(--c-dark) 20%, transparent);
+    }
+
+    .toggle-switch input:checked + .toggle-track {
+      background: linear-gradient(135deg, var(--c-action) 0%, color-mix(in srgb, var(--c-action) 80%, var(--c-danger)) 100%);
+    }
+
+    .toggle-switch input:checked + .toggle-track::after {
+      transform: translateX(20px);
+      background: white;
+    }
+
     /* === FOOTER === */
     .footer {
       text-align: center;
@@ -646,8 +623,16 @@
       gap: 4px;
     }
 
-    .footer-heart {
-      color: var(--c-danger);
+    .footer-link {
+      color: var(--c-action);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 200ms ease;
+    }
+
+    .footer-link:hover {
+      color: var(--c-action-hover);
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -657,13 +642,12 @@
       <div class="header-left">
         <div class="header-icon">
           <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="6" y="4" width="4" height="16" rx="1"/>
-            <rect x="14" y="4" width="4" height="16" rx="1"/>
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
           </svg>
         </div>
         <div class="header-text">
           <h1>Navegação Consciente</h1>
-          <p>v2.0 • mindful browsing</p>
         </div>
       </div>
       <div class="theme-switcher">
@@ -698,22 +682,6 @@
       </div>
     </header>
 
-    <section class="site-card glass-card">
-      <div class="site-card-header">
-        <span class="site-card-label">Site atual</span>
-        <span class="site-card-status allowed" id="current-site-status">livre</span>
-      </div>
-      <p class="site-card-name" id="current-site-name">carregando...</p>
-      <button class="btn btn-danger" id="btn-toggle-current">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="15" y1="9" x2="9" y2="15"/>
-          <line x1="9" y1="9" x2="15" y2="15"/>
-        </svg>
-        Bloquear site
-      </button>
-    </section>
-
     <section class="config-section glass-card">
       <p class="config-label">
         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -729,6 +697,38 @@
         <button class="timer-btn" data-time="15">15s</button>
         <button class="timer-btn" data-time="30">30s</button>
       </div>
+    </section>
+
+    <section class="config-section glass-card">
+      <p class="config-label">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        Alerta de tempo
+      </p>
+      <div class="timer-grid">
+        <button class="alert-btn" data-alert="1">1m</button>
+        <button class="alert-btn" data-alert="5">5m</button>
+        <button class="alert-btn active" data-alert="10">10m</button>
+        <button class="alert-btn" data-alert="30">30m</button>
+        <button class="alert-btn" data-alert="0">Off</button>
+      </div>
+    </section>
+
+    <section class="toggle-row glass-card">
+      <span class="toggle-label">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Cronômetro flutuante
+      </span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="toggle-cronometro" checked>
+        <span class="toggle-track"></span>
+      </label>
     </section>
 
     <section class="config-section glass-card">
@@ -768,7 +768,7 @@
     </section>
 
     <footer class="footer">
-      feito com <span class="footer-heart">♥</span> para sua produtividade
+      Feito por <a href="https://www.ygorandrade.work/" target="_blank" class="footer-link">Ygor Andrade</a>
     </footer>
   </div>
 
