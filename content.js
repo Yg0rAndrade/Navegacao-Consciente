@@ -44,16 +44,23 @@ let showClock = true;
 let currentTheme = 'light';
 let currentHostname = window.location.hostname.replace('www.', '');
 let alertaAtivo = false;
+let hardBlockedSites = [];
+let featYoutubeSpeed = true;
+let featInstagramReels = true;
+let siteFeatureObserver = null;
 
 // Carrega as configurações
 async function loadConfig() {
   return new Promise((resolve) => {
-    chrome.storage.sync.get(['sites', 'timerDuration', 'alertInterval', 'showClock', 'theme'], (result) => {
+    chrome.storage.sync.get(['sites', 'hardBlockedSites', 'timerDuration', 'alertInterval', 'showClock', 'theme', 'feat_youtube_speed', 'feat_instagram_reels'], (result) => {
       sites = result.sites || [];
       timerDuration = result.timerDuration || 10;
       alertInterval = result.alertInterval !== undefined ? result.alertInterval : 10;
       showClock = result.showClock !== undefined ? result.showClock : true;
       currentTheme = result.theme || 'light';
+      hardBlockedSites = result.hardBlockedSites || [];
+      featYoutubeSpeed = result.feat_youtube_speed !== false;
+      featInstagramReels = result.feat_instagram_reels !== false;
       resolve();
     });
   });
@@ -61,7 +68,8 @@ async function loadConfig() {
 
 // Verifica se o site atual está na lista
 function siteNaLista() {
-  return sites.some(site => currentHostname.includes(site) || site.includes(currentHostname));
+  if (!currentHostname) return false;
+  return sites.some(site => site && (currentHostname.includes(site) || site.includes(currentHostname)));
 }
 
 // Verifica se já respondeu para este site na sessão
@@ -283,6 +291,12 @@ function mostrarCronometro() {
   const segPassados = Math.floor((Date.now() - inicioSessao) / 1000);
 
   widget.innerHTML = `
+    <button class="cronometro-close" id="cronometro-close" title="Fechar cronômetro">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
     <div class="cronometro-icon">
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
@@ -292,7 +306,97 @@ function mostrarCronometro() {
     <span class="cronometro-time" id="cronometro-display">${formatarTempo(segPassados)}</span>
   `;
 
+  // Restaura posicao salva
+  const posChave = `impulso_pos_${currentHostname}`;
+  const posSalva = sessionStorage.getItem(posChave);
+  if (posSalva) {
+    try {
+      const { x, y } = JSON.parse(posSalva);
+      widget.style.top = `${y}px`;
+      widget.style.left = `${x}px`;
+      widget.style.right = 'auto';
+    } catch (e) { /* ignora posicao invalida */ }
+  }
+
   document.documentElement.appendChild(widget);
+
+  // Drag and drop
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let widgetStartX = 0;
+  let widgetStartY = 0;
+  const DRAG_THRESHOLD = 4;
+
+  function getPos(e) {
+    if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    return { x: e.clientX, y: e.clientY };
+  }
+
+  function onDragStart(e) {
+    if (e.target.closest('.cronometro-close')) return;
+
+    const pos = getPos(e);
+    dragStartX = pos.x;
+    dragStartY = pos.y;
+
+    const rect = widget.getBoundingClientRect();
+    widgetStartX = rect.left;
+    widgetStartY = rect.top;
+    isDragging = false;
+
+    document.addEventListener('mousemove', onDragMove);
+    document.addEventListener('mouseup', onDragEnd);
+    document.addEventListener('touchmove', onDragMove, { passive: false });
+    document.addEventListener('touchend', onDragEnd);
+  }
+
+  function onDragMove(e) {
+    const pos = getPos(e);
+    const dx = pos.x - dragStartX;
+    const dy = pos.y - dragStartY;
+
+    if (!isDragging && Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return;
+
+    isDragging = true;
+    e.preventDefault();
+    widget.classList.add('dragging');
+
+    const maxX = window.innerWidth - widget.offsetWidth;
+    const maxY = window.innerHeight - widget.offsetHeight;
+    const newX = Math.min(Math.max(0, widgetStartX + dx), maxX);
+    const newY = Math.min(Math.max(0, widgetStartY + dy), maxY);
+
+    widget.style.left = `${newX}px`;
+    widget.style.top = `${newY}px`;
+    widget.style.right = 'auto';
+  }
+
+  function onDragEnd() {
+    document.removeEventListener('mousemove', onDragMove);
+    document.removeEventListener('mouseup', onDragEnd);
+    document.removeEventListener('touchmove', onDragMove);
+    document.removeEventListener('touchend', onDragEnd);
+
+    if (isDragging) {
+      widget.classList.remove('dragging');
+      sessionStorage.setItem(posChave, JSON.stringify({
+        x: parseInt(widget.style.left),
+        y: parseInt(widget.style.top)
+      }));
+    }
+    setTimeout(() => { isDragging = false; }, 0);
+  }
+
+  widget.addEventListener('mousedown', onDragStart);
+  widget.addEventListener('touchstart', onDragStart, { passive: true });
+
+  // Botao fechar (ignora se estava arrastando)
+  document.getElementById('cronometro-close').addEventListener('click', () => {
+    if (isDragging) return;
+    widget.style.animation = 'cronometroOut 0.3s ease-out forwards';
+    setTimeout(() => widget.remove(), 300);
+  });
 
   const display = document.getElementById('cronometro-display');
   let ultimoAlerta = 0;
@@ -522,9 +626,19 @@ function mostrarModal() {
   document.addEventListener('keydown', handleKeyDown, true);
 }
 
-// Escuta mudanças de tema no storage para atualizar o cronômetro em tempo real
+// Escuta mudanças no storage para atualizar em tempo real
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync') {
+    if (changes.hardBlockedSites !== undefined) {
+      hardBlockedSites = changes.hardBlockedSites.newValue || [];
+      const isHardBlocked = !!currentHostname && hardBlockedSites.some(s => s && (currentHostname.includes(s) || s.includes(currentHostname)));
+      if (isHardBlocked && !document.getElementById('impulso-bloqueio')) {
+        mostrarBloqueioTotal();
+      } else if (!isHardBlocked) {
+        document.getElementById('impulso-bloqueio')?.remove();
+        document.documentElement.classList.remove('impulso-bloqueado');
+      }
+    }
     if (changes.theme) {
       currentTheme = changes.theme.newValue || 'light';
       const widget = document.getElementById('impulso-cronometro');
@@ -549,11 +663,129 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 });
 
+// Frases para bloqueio total
+const frasesBloqueio = [
+  'Você bloqueou este site por uma razão. Confie em si mesmo.',
+  'Cada segundo aqui é um segundo roubado do seu futuro.',
+  'Sua versão mais produtiva está esperando você voltar.',
+  'Este site foi bloqueado por você mesmo. Respeite sua decisão.',
+  'O que você perderia se ficasse aqui por uma hora?',
+  'Você programou este bloqueio quando estava com a cabeça clara.',
+  'Confie no você de ontem, que decidiu bloquear isto.',
+  'Cada distração tem um custo que você não vê agora.',
+  'O hábito começa quando você cede pela primeira vez.',
+  'Este clique pode custar muito mais do que parece.',
+  'Você já sabe como essa sessão vai terminar.',
+  'Sua atenção é o bem mais valioso que você tem.',
+  'Voltar agora é um ato de respeito a si mesmo.',
+  'O prazer desta distração dura minutos. O arrependimento, horas.',
+  'Você não precisa deste site agora.',
+  'Pense no que seu eu futuro diria sobre este momento.',
+  'Toda grande conquista começa com uma distração recusada.',
+  'Este site vai continuar existindo. Seu tempo, não.',
+  'A disciplina de hoje é a liberdade de amanhã.',
+  'Quantas vezes você já arrependeu de ter entrado aqui?',
+  'Sair agora é a escolha mais inteligente que você pode fazer.',
+  'Sua meta está esperando enquanto você hesita.',
+  'Você é mais forte do que esse impulso.',
+  'O que você poderia conquistar com esse tempo?',
+  'Cada "só mais um pouco" custa caro no final.',
+  'Você criou este bloqueio para proteger seus sonhos.',
+  'Resista. Seu foco agradece.',
+  'Nada neste site vale mais do que seu tempo.',
+  'Voltar agora é vencer a batalha mais importante do dia.',
+  'Sua produtividade está em suas mãos, literalmente.',
+  'O autocontrole é o superpoder mais subestimado.',
+  'Isso está te aproximando ou afastando do seu objetivo?',
+  'Este momento de resistência define quem você está se tornando.',
+  'Não alimente o hábito que você quer eliminar.',
+  'Seu cérebro quer dopamina fácil. Não deixe ele vencer.',
+  'Fechar esta página é uma vitória pequena com grande impacto.',
+  'Cada vez que você resiste, fica mais fácil da próxima vez.',
+  'Este site roubou horas suas antes. Não deixe roubar mais.',
+  'Você merece usar seu tempo em algo que realmente importa.',
+  'A versão de você que chega nos seus objetivos não entra aqui.',
+  'Um passo de volta agora vale mil passos à frente depois.',
+  'Sua atenção é escassa. Use-a sabiamente.',
+  'Você está a uma escolha de ser a pessoa que quer ser.',
+  'O impulso passa. O arrependimento fica.',
+  'Você não é o seu impulso. Você é maior do que isso.',
+  'Construir foco é exatamente isso: resistir quando é difícil.',
+  'Volte ao que realmente importa. Agora.',
+  'Sua melhor versão não está neste site.',
+  'Você tem algo mais importante a fazer. E você sabe disso.',
+  'Para acessar este site, remova o cadeado no popup da extensão.',
+];
+
+function fraseBloqueiAleatoria() {
+  return frasesBloqueio[Math.floor(Math.random() * frasesBloqueio.length)];
+}
+
+// Mostra a tela de bloqueio total
+function mostrarBloqueioTotal() {
+  if (document.getElementById('impulso-bloqueio')) return;
+
+  pausarMidia();
+  document.documentElement.classList.add('impulso-bloqueado');
+
+  const overlay = document.createElement('div');
+  overlay.id = 'impulso-bloqueio';
+
+  overlay.innerHTML = `
+    <div id="impulso-bloqueio-modal">
+      <div class="bloqueio-icon">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <p class="bloqueio-label">Site bloqueado</p>
+      <p class="bloqueio-site">${currentHostname}</p>
+      <p class="bloqueio-frase">"${fraseBloqueiAleatoria()}"</p>
+      <button class="bloqueio-btn" id="bloqueio-btn-voltar">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Voltar
+      </button>
+      <p class="bloqueio-hint">Para acessar, remova o cadeado no popup</p>
+    </div>
+  `;
+
+  document.documentElement.appendChild(overlay);
+
+  document.getElementById('bloqueio-btn-voltar').addEventListener('click', () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.replace('about:blank');
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' || e.key === 'Backspace') {
+      if (window.history.length > 1) window.history.back();
+      else window.location.replace('about:blank');
+    }
+  }, { once: true, capture: true });
+}
+
 // Função principal
 async function init() {
   await loadConfig();
 
   if (sites.length === 0 || !siteNaLista()) return;
+
+  const isHardBlocked = !!currentHostname && hardBlockedSites.some(s => s && (currentHostname.includes(s) || s.includes(currentHostname)));
+  if (isHardBlocked) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mostrarBloqueioTotal);
+    } else {
+      mostrarBloqueioTotal();
+    }
+    return;
+  }
 
   if (jaRespondeu()) {
     if (showClock) mostrarCronometro();
@@ -568,3 +800,59 @@ async function init() {
 }
 
 init();
+
+// === FUNCIONALIDADES ESPECÍFICAS POR SITE ===
+
+function updateYoutubeSpeedItem() {
+  document.querySelectorAll('.ytp-menuitem').forEach(item => {
+    const label = item.querySelector('.ytp-menuitem-label');
+    if (label && label.textContent.trim() === 'Velocidade da reprodução') {
+      if (featYoutubeSpeed) {
+        item.style.setProperty('display', 'none', 'important');
+      } else {
+        item.style.removeProperty('display');
+      }
+    }
+  });
+}
+
+function removeInstagramReels() {
+  document.querySelectorAll('a[href="/reels/"]').forEach(el => {
+    const parent = el.closest('li') || el.parentElement;
+    if (parent) parent.style.setProperty('display', 'none', 'important');
+  });
+}
+
+function setupSiteFeatureObserver() {
+  if (!document.body) return;
+
+  if (currentHostname.includes('youtube.com')) {
+    const ytObserver = new MutationObserver(updateYoutubeSpeedItem);
+    ytObserver.observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (currentHostname.includes('instagram.com')) {
+    const igObserver = new MutationObserver(() => {
+      if (featInstagramReels) removeInstagramReels();
+    });
+    igObserver.observe(document.body, { childList: true, subtree: true });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupSiteFeatureObserver);
+} else {
+  setupSiteFeatureObserver();
+}
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== 'sync') return;
+  if (changes.feat_youtube_speed !== undefined) {
+    featYoutubeSpeed = changes.feat_youtube_speed.newValue !== false;
+    updateYoutubeSpeedItem();
+  }
+  if (changes.feat_instagram_reels !== undefined) {
+    featInstagramReels = changes.feat_instagram_reels.newValue !== false;
+    if (featInstagramReels) removeInstagramReels();
+  }
+});

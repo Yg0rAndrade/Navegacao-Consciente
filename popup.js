@@ -30,8 +30,11 @@ const timerOptions = document.querySelectorAll('.timer-btn');
 const alertOptions = document.querySelectorAll('.alert-btn');
 const themeBtns = document.querySelectorAll('.theme-btn');
 const toggleCronometro = document.getElementById('toggle-cronometro');
+const featYoutubeSpeed = document.getElementById('feat-youtube-speed');
+const featInstagramReels = document.getElementById('feat-instagram-reels');
 
 let sites = [];
+let hardBlockedSites = [];
 let timerDuration = 10;
 let alertInterval = 10;
 let showClock = true;
@@ -39,14 +42,17 @@ let currentTheme = 'light';
 
 // Carrega os dados salvos
 async function loadData() {
-  const result = await chrome.storage.sync.get(['sites', 'timerDuration', 'alertInterval', 'showClock', 'theme']);
+  const result = await chrome.storage.sync.get(['sites', 'hardBlockedSites', 'timerDuration', 'alertInterval', 'showClock', 'theme', 'feat_youtube_speed', 'feat_instagram_reels']);
   sites = result.sites || [];
+  hardBlockedSites = result.hardBlockedSites || [];
   timerDuration = result.timerDuration || 10;
   alertInterval = result.alertInterval !== undefined ? result.alertInterval : 10;
   showClock = result.showClock !== undefined ? result.showClock : true;
   currentTheme = result.theme || 'light';
 
   toggleCronometro.checked = showClock;
+  featYoutubeSpeed.checked = result.feat_youtube_speed !== false;
+  featInstagramReels.checked = result.feat_instagram_reels !== false;
 
   timerOptions.forEach(opt => {
     opt.classList.toggle('active', parseInt(opt.dataset.time) === timerDuration);
@@ -77,8 +83,18 @@ async function saveTheme(theme) {
 
 // Salva os sites
 async function saveSites() {
-  await chrome.storage.sync.set({ sites });
+  await chrome.storage.sync.set({ sites, hardBlockedSites });
   renderSites();
+}
+
+// Alterna bloqueio total por site
+function toggleHardBlockSite(site) {
+  if (hardBlockedSites.includes(site)) {
+    hardBlockedSites = hardBlockedSites.filter(s => s !== site);
+  } else {
+    hardBlockedSites.push(site);
+  }
+  saveSites();
 }
 
 // Salva o timer
@@ -106,21 +122,36 @@ function renderSites() {
     return;
   }
 
-  sitesContainer.innerHTML = sites.map((site, index) => `
-    <div class="site-item" style="animation-delay: ${index * 50}ms">
-      <span class="site-item-name">${site}</span>
-      <button class="btn-remove" data-site="${site}" title="Remover ${site}">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"/>
-          <line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
-      </button>
-    </div>
-  `).join('');
+  sitesContainer.innerHTML = sites.map((site, index) => {
+    const isBlocked = hardBlockedSites.includes(site);
+    return `
+      <div class="site-item${isBlocked ? ' hard-blocked' : ''}" style="animation-delay: ${index * 50}ms">
+        <span class="site-item-name">${site}</span>
+        <div style="display:flex;align-items:center;gap:2px">
+          <button class="btn-lock${isBlocked ? ' active' : ''}" data-site="${site}" title="${isBlocked ? 'Desbloquear' : 'Bloqueio total'}">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              ${isBlocked
+                ? '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
+                : '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>'}
+            </svg>
+          </button>
+          <button class="btn-remove" data-site="${site}" title="Remover ${site}">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
 
-  // Adiciona eventos de remover
   sitesContainer.querySelectorAll('.btn-remove').forEach(btn => {
     btn.addEventListener('click', () => removeSite(btn.dataset.site));
+  });
+
+  sitesContainer.querySelectorAll('.btn-lock').forEach(btn => {
+    btn.addEventListener('click', () => toggleHardBlockSite(btn.dataset.site));
   });
 }
 
@@ -185,6 +216,25 @@ alertOptions.forEach(opt => {
 toggleCronometro.addEventListener('change', async () => {
   showClock = toggleCronometro.checked;
   await chrome.storage.sync.set({ showClock });
+});
+
+// Site tabs
+document.querySelectorAll('.site-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.site-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.site-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(`panel-${tab.dataset.site}`).classList.add('active');
+  });
+});
+
+// Feature toggles
+featYoutubeSpeed.addEventListener('change', async () => {
+  await chrome.storage.sync.set({ feat_youtube_speed: featYoutubeSpeed.checked });
+});
+
+featInstagramReels.addEventListener('change', async () => {
+  await chrome.storage.sync.set({ feat_instagram_reels: featInstagramReels.checked });
 });
 
 // Theme switcher
